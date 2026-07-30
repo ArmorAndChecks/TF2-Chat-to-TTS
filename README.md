@@ -1,7 +1,7 @@
 # TF2 Chat to TTS & Soundboard Pipeline
 
 A VBScript for Team Fortress 2 that adds native Text-to-Speech (`!tts`) and a soundboard using the game's console or chat logs.
-This is not including how to play music though your mic (check out 'vb cable' for transferring music from MPHC to TF2 mic.)
+This is not including how to play music though your mic (check out 'vb cable' for transferring music from sounds to TF2 mic.)
 
 **Steam Profile:** [https://steamcommunity.com/id/admirable_but_mistaken/](http://steamcommunity.com/profiles/76561198980644010)
 
