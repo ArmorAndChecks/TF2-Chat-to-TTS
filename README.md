@@ -1,2 +1,82 @@
-# TF2-Chat-to-TTS
-VBScript pipeline for Team Fortress 2 that brings Text-to-Speech (`!tts`) and an auto-scanned custom soundboard meme spammer directly into your game via console logs and chat text.
+# TF2 Native TTS & Soundboard Pipeline
+
+A simple VBScript for Team Fortress 2 that adds native Text-to-Speech (`!tts`) and a soundboard using the game's console or chat logs.
+
+**Steam Profile:** [https://steamcommunity.com/id/admirable_but_mistaken/](http://steamcommunity.com/profiles/76561198980644010)
+
+## Features
+
+- Auto-scans `.wav` files and generates `effects.cfg`
+- Play sounds by number or filename
+- Windows SAPI Text-to-Speech.
+- Male (`/m`) and Female (`/f`) voice. For Example: In TF2 chat !tts /m hi guys
+- Optional `!meme` chat commands.
+- `halt` command to stop audio.
+- Enable or disable features with simple settings.
+- 
+## Installation
+
+1. Download tts_bot.vbs.
+2. Place `tts_bot.vbs` anywhere on your computer.
+3. Create a folder for your `.wav` files.
+4. Edit `tts_bot.vbs` and set:
+   - `logPath` to your `console.log`
+   - `soundsFolder` to your sound folder
+5. Launch TF2 with:
+
+```text
+-condebug
+```
+
+## Configuration
+
+```vbscript
+enableTTS = True
+enableSoundboard = True
+allowChatMemeTrigger = True
+```
+
+## Usage
+
+Start the script by running:
+
+```text
+tts_bot.vbs
+```
+
+Load the sound menu:
+
+```text
+exec effects
+```
+
+Commands:
+
+```text
+!tts Hello world
+!tts /f Hello world
+!tts /m Hello world
+
+!meme airhorn
+!meme 5
+
+stopp
+```
+
+## Requirements
+
+- Windows
+- Team Fortress 2
+- Developer Console enabled
+- `-condebug` launch option
+
+## Uninstall
+
+- Close the running VBScript.
+- Delete `tts_bot.vbs`.
+- Delete your sound folder.
+- (Optional) Delete `tf/cfg/effects.cfg`.
+
+## License
+
+Feel free to modify and share this project.
