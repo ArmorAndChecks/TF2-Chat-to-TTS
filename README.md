@@ -1,6 +1,6 @@
-# TF2 Native TTS & Soundboard Pipeline
+# TF2 Chat to TTS & Soundboard Pipeline
 
-A simple VBScript for Team Fortress 2 that adds native Text-to-Speech (`!tts`) and a soundboard using the game's console or chat logs.
+A VBScript for Team Fortress 2 that adds native Text-to-Speech (`!tts`) and a soundboard using the game's console or chat logs.
 
 **Steam Profile:** [https://steamcommunity.com/id/admirable_but_mistaken/](http://steamcommunity.com/profiles/76561198980644010)
 
