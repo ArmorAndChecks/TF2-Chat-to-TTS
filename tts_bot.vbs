@@ -11,8 +11,11 @@ allowChatMemeTrigger = True  ' Set to True to allow triggering sounds via chat (
 Set objFSO = CreateObject("Scripting.FileSystemObject")
 Set sapi = CreateObject("SAPI.SpVoice")
 
+' Global variable for soundboard volume (0 to 100)
+globalSoundVolume = 100
+
 logPath = "C:\Program Files (x86)\Steam\steamapps\common\Team Fortress 2\tf\console.log"
-soundsFolder = "D:\sounds" ' Folder where your .wav sound files live
+soundsFolder = "D:\Codes\TF2tts\sounds" ' Folder where your .wav sound files live
 cfgPath = "C:\Program Files (x86)\Steam\steamapps\common\Team Fortress 2\tf\cfg\effects.cfg"
 
 ' GENERATE EFFECTS.CFG ON STARTUP (If enabled)
@@ -104,6 +107,32 @@ Do
                     ttsText = Trim(parts(1))
 
                     If Len(ttsText) > 0 Then
+                        ' --- INLINE VOLUME ADJUSTMENT (/vol X) ---
+                        On Error Resume Next
+                        Dim lowerText
+                        lowerText = LCase(ttsText)
+                        
+                        If InStr(lowerText, "/vol") > 0 Then
+                            volPos = InStr(lowerText, "/vol")
+                            subPart = Trim(Mid(ttsText, volPos + 4))
+                            subParts = Split(subPart, " ")
+                            If UBound(subParts) >= 0 Then
+                                volVal = Trim(subParts(0))
+                                If IsNumeric(volVal) Then
+                                    vNum = CLng(volVal)
+                                    If vNum >= 0 And vNum <= 100 Then
+                                        sapi.Volume = vNum
+                                        globalSoundVolume = vNum
+                                    End If
+                                End If
+                            End If
+                            ' Clean /vol and the numeric value out of ttsText
+                            ttsText = Trim(Replace(ttsText, "/vol " & volVal, "", 1, 1, 1))
+                            ttsText = Trim(Replace(ttsText, "/vol" & volVal, "", 1, 1, 1))
+                        End If
+                        On Error Goto 0
+                        ' -----------------------------------------
+
                         ' --- DYNAMIC VOICE SWITCHING (/m or /f) ---
                         On Error Resume Next
                         Dim targetVoiceToken
@@ -135,15 +164,57 @@ Do
             ElseIf enableSoundboard And allowChatMemeTrigger And InStr(line, "!meme") > 0 And InStr(line, "Say:") = 0 Then
                 parts = Split(line, "!meme")
                 If UBound(parts) >= 1 Then
-                    typedInput = LCase(Trim(parts(1)))
+                    memeInput = Trim(parts(1))
 
-                    If Len(typedInput) > 0 And objFSO.FolderExists(soundsFolder) Then
-                        PlaySoundFile(typedInput)
+                    If Len(memeInput) > 0 And objFSO.FolderExists(soundsFolder) Then
+                        ' --- INLINE VOLUME ADJUSTMENT FOR MEMES (/vol X) ---
+                        On Error Resume Next
+                        Dim lowerMeme
+                        lowerMeme = LCase(memeInput)
+
+                        If InStr(lowerMeme, "/vol") > 0 Then
+                            mVolPos = InStr(lowerMeme, "/vol")
+                            mSubPart = Trim(Mid(memeInput, mVolPos + 4))
+                            mSubParts = Split(mSubPart, " ")
+                            If UBound(mSubParts) >= 0 Then
+                                mVolVal = Trim(mSubParts(0))
+                                If IsNumeric(mVolVal) Then
+                                    mVNum = CLng(mVolVal)
+                                    If mVNum >= 0 And mVNum <= 100 Then
+                                        sapi.Volume = mVNum
+                                        globalSoundVolume = mVNum
+                                    End If
+                                End If
+                            End If
+                            ' Clean /vol and the numeric value out of memeInput
+                            memeInput = Trim(Replace(memeInput, "/vol " & mVolVal, "", 1, 1, 1))
+                            memeInput = Trim(Replace(memeInput, "/vol" & mVolVal, "", 1, 1, 1))
+                        End If
+                        On Error Goto 0
+                        ' ---------------------------------------------------
+
+                        If Len(memeInput) > 0 Then
+                            PlaySoundFile(LCase(memeInput))
+                        End If
                     End If
                 End If
 
-            ' --- 3. SOUNDBOARD & STOP MODULE (Conditional) ---
-            ElseIf enableSoundboard And InStr(line, "Unknown command:") > 0 Then
+            ' --- 3. STANDALONE CHAT VOLUME CONTROL MODULE (!vol [0-100]) ---
+            ElseIf enableTTS And InStr(line, "!vol") > 0 And InStr(line, "Say:") = 0 Then
+                parts = Split(line, "!vol")
+                If UBound(parts) >= 1 Then
+                    volVal = Trim(parts(1))
+                    If IsNumeric(volVal) Then
+                        vNum = CLng(volVal)
+                        If vNum >= 0 And vNum <= 100 Then
+                            sapi.Volume = vNum
+                            globalSoundVolume = vNum
+                        End If
+                    End If
+                End If
+
+            ' --- 4. SOUNDBOARD, STOP, & CONSOLE VOLUME MODULE ---
+            ElseIf InStr(line, "Unknown command:") > 0 Then
                 parts = Split(line, "Unknown command:")
                 If UBound(parts) >= 1 Then
                     typedInput = LCase(Trim(parts(1)))
@@ -151,7 +222,17 @@ Do
                     ' Emergency stop kill switch
                     If typedInput = "stopp" Then
                         sapi.Speak "", 2
-                    ElseIf Len(typedInput) > 0 And objFSO.FolderExists(soundsFolder) Then
+                    ' Console volume adjustment (e.g., vol 50)
+                    ElseIf Left(typedInput, 4) = "vol " Then
+                        volVal = Trim(Mid(typedInput, 5))
+                        If IsNumeric(volVal) Then
+                            vNum = CLng(volVal)
+                            If vNum >= 0 And vNum <= 100 Then
+                                sapi.Volume = vNum
+                                globalSoundVolume = vNum
+                            End If
+                        End If
+                    ElseIf enableSoundboard And Len(typedInput) > 0 And objFSO.FolderExists(soundsFolder) Then
                         PlaySoundFile(typedInput)
                     End If
                 End If
@@ -166,7 +247,7 @@ Do
     WScript.Sleep 1000
 Loop
 
-' --- REUSABLE SOUND PLAYBACK FUNCTION ---
+' --- REUSABLE SOUND PLAYBACK FUNCTION WITH DYNAMIC DURATION WAITING ---
 Sub PlaySoundFile(targetInput)
     Set folder = objFSO.GetFolder(soundsFolder)
     currentIndex = 1
@@ -186,10 +267,30 @@ Sub PlaySoundFile(targetInput)
 
             If matchFound Then
                 On Error Resume Next
-                Dim fileStream
-                Set fileStream = CreateObject("SAPI.SpFileStream")
-                fileStream.Open file.Path, 0, False
-                sapi.SpeakStream fileStream, 1
+                
+                Dim player
+                Set player = CreateObject("WMPlayer.OCX")
+                player.settings.autoStart = True
+                player.settings.volume = globalSoundVolume
+                player.URL = file.Path
+                player.controls.play
+                
+                ' Give WMP a brief moment to load the media info and compute duration
+                WScript.Sleep 200
+                
+                ' Dynamically wait until the audio file finishes playing completely
+                Do While player.playState = 3 ' 3 means Playing
+                    WScript.Sleep 100
+                Loop
+                
+                ' Fallback safety buffer in case playState changes quickly
+                If player.currentMedia.duration > 0 Then
+                    WScript.Sleep (player.currentMedia.duration * 1000)
+                Else
+                    WScript.Sleep 3000
+                End If
+                
+                player.close
                 On Error Goto 0
                 Exit For
             End If
