@@ -81,6 +81,9 @@ stopp
 - Delete your sound folder.
 - (Optional) Delete `tf/cfg/effects.cfg`.
 
+## Current Bugs
+- Low volume cut off; When triggering audio clips (memes/soundboard items) through the VBScript, sounds cut off prematurely, can be caused by TF2 mic not detecting low sound to play it so it becomes quiet in voice chat.
+
 ## License
 
 Feel free to modify and share this project.
