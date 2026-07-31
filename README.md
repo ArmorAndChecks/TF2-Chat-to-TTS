@@ -12,7 +12,7 @@ This is not including how to play music though your mic (check out 'vb cable' fo
 - Windows SAPI Text-to-Speech.
 - Male (`/m`) and Female (`/f`) voice. For Example: In TF2 chat !tts /m hi guys
 - Optional `!meme` chat commands.
-- `halt` command to stop audio.
+- `stopp` command to stop audio.
 - Enable or disable features with simple settings.
 - Adjust volume for tts and memes in the TF2 chat with /vol for example !tts /vol 60 or !memes /vol 49
 
@@ -64,7 +64,7 @@ Commands:
 !meme airhorn
 !meme 5
 
-halt
+stopp
 ```
 
 ## Requirements
