@@ -58,11 +58,13 @@ Commands:
 !tts Hello world
 !tts /f Hello world
 !tts /m Hello world
+!tts /vol 50
+!memes /vol 49
 
 !meme airhorn
 !meme 5
 
-stopp
+halt
 ```
 
 ## Requirements
