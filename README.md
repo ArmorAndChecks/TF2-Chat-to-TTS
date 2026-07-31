@@ -14,7 +14,8 @@ This is not including how to play music though your mic (check out 'vb cable' fo
 - Optional `!meme` chat commands.
 - `halt` command to stop audio.
 - Enable or disable features with simple settings.
-- 
+- Adjust volume for tts and memes in the TF2 chat with /vol for example !tts /vol 60 or !memes /vol 49
+
 ## Installation
 
 1. Download tts_bot.vbs.
